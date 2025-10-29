@@ -14,6 +14,13 @@ builder.Services.AddControllers().AddJsonOptions(o =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddControllers()
+  .AddJsonOptions(o =>
+  {
+      o.JsonSerializerOptions.PropertyNamingPolicy = null;
+      o.JsonSerializerOptions.DictionaryKeyPolicy = null;
+  });
+
 // DI
 builder.Services.AddScoped(typeof(DapperContext<>), typeof(DapperContext<>));
 // builder.Services.AddDbContext<ApplicationDBContext>(db =>
