@@ -39,6 +39,7 @@ builder.Services.AddCors(options =>
     );
 });
 
+
 ServiceList.RegisterServiceList(builder.Services);
 
 var app = builder.Build();
