@@ -76,6 +76,54 @@ ORDER BY a.BankID DESC;";
 
         }
 
+        public async Task<Bas_Bank> SaveAsync(Bas_Bank entity)
+        {
+            var parameters = (dynamic)null;
+            try
+            {
+                parameters = new DynamicParameters();
+                parameters.Add("@SaveOption", entity.SaveOption);
+                parameters.Add("@BankID", entity.BankID);
+                parameters.Add("@BankCode", entity.BankCode);
+                parameters.Add("@BankName", entity.BankName);
+                parameters.Add("@BankShortName", entity.BankShortName);
+                parameters.Add("@BankAddress", entity.BankAddress);
+                parameters.Add("@SwiftCode", entity.SwiftCode);
+                parameters.Add("@ADCode", entity.ADCode);
+                parameters.Add("@IsBeneficiaryBank", entity.IsBeneficiaryBank);
+                parameters.Add("@IsAdvisingBank", entity.IsAdvisingBank);
+                parameters.Add("@IsNegoBank", entity.IsNegoBank);
+                parameters.Add("@IsActive", entity.IsActive);
+                parameters.Add("@Approved", entity.Approved);
+                parameters.Add("@UserBy", entity.UserBy);
+                parameters.Add("@IdentityValue", 0, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+                parameters.Add("@ErrNo", 0, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+
+                entity.NoofRows = await _context.ExecuteAsync("spSet_bas_Bank", parameters, 30, CommandType.StoredProcedure);
+                entity.ResultId = parameters.Get<int>("@IdentityValue");
+                entity.ErrorNo = parameters.Get<int>("@ErrNo");
+
+
+                if (entity.NoofRows > 0 && entity.ResultId > 0)
+                {
+                    entity.Message = "Save operation successful.";
+                }
+                else
+                {
+                    entity.Message = "Save operation failed.";
+                }
+            }
+            catch (Exception ex)
+            {
+                entity.Message = ex.Message;
+            }
+            finally
+            {
+                parameters = null;
+            }
+            return entity;
+        }
+         
 
     }
 }
