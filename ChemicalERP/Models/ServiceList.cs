@@ -9,6 +9,7 @@ namespace ChemicalERP.Models
         public static void RegisterServiceList(IServiceCollection services)
         {
             services.AddScoped<ILoginService, LoginService>(); 
+            services.AddScoped<ISettingService, SettingService>(); 
         }
     }
 }

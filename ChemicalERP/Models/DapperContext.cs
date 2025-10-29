@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using ChemicalERP.Models.KendoGridManager;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -138,5 +139,51 @@ namespace ChemicalERP.Models
                 Connection.Close();
             }
         }
+
+        public async Task<GridEntity<T>> GetKendoGridDataAsync<CT>(GridOptions options, string query, string orderBy, string condition)
+        {
+            try
+            {
+                query = query.Replace(';', ' ');
+
+                string sqlQuery = options != null ? GridQueryBuilder<T>.Query(options, query, orderBy, condition) : query;
+
+                if (!string.IsNullOrEmpty(condition))
+                {
+                    condition = " WHERE " + condition;
+                }
+
+                var condition1 = options != null ? GridQueryBuilder<T>.FilterCondition(options.filter) : "";
+                if (!string.IsNullOrEmpty(condition1))
+                {
+                    if (!string.IsNullOrEmpty(condition))
+                    {
+                        condition += " And " + condition1;
+                    }
+                    else
+                    {
+                        condition = " WHERE " + condition1;
+                    }
+                }
+
+                Connection.Open();
+                var records = Connection.Query<T>(sqlQuery).ToList();
+                var sqlCount = "SELECT COUNT(*) FROM (" + query + " ) As tbl " + condition;
+                var count = Connection.Query<int>(sqlCount).ToList();
+                var totalCount = count[0];
+                var result = new GridResult<T>().Data(records, totalCount);
+                return await Task.FromResult(result);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                Connection.Close();
+            }
+
+        }
+
     }
 }
