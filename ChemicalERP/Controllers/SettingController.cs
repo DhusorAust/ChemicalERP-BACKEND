@@ -47,7 +47,7 @@ namespace ChemicalERP.Controllers
             return Ok(new
             {
                 message = res.Message ?? "Saved",
-                id = res.ResultId,
+                ResultId = res.ResultId,
                 rows = res.NoofRows
             });
         }
