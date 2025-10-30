@@ -23,47 +23,39 @@ namespace ChemicalERP.Services
         public async Task<GridEntity<Bas_Bank>> GetBankListAsync(Status status, string? q)
         {
             var where = new StringBuilder("WHERE 1=1");
-            var dp = new DynamicParameters();
 
-            // Status filter (ALL | EDIT | APPROVED)
+            var dp = new DynamicParameters(); 
+
             if (status == Status.EDIT)
-                where.Append(" AND ISNULL(a.IsActive,0)=1 AND ISNULL(a.Approved,0)=0");
+            {
+                where.Append(" and ISNULL(a.Approved,0)=0");
+            }
+               
             else if (status == Status.APPROVED)
-                where.Append(" AND ISNULL(a.IsActive,0)=1 AND ISNULL(a.Approved,0)=1");
+            {
+                where.Append(" and ISNULL(a.Approved,0)=1");
+            }
+               
 
-            // Search filter
             if (!string.IsNullOrWhiteSpace(q))
             {
                 dp.Add("@q", $"%{q.Trim()}%");
                 where.Append(" AND (a.BankName LIKE @q OR a.BankShortName LIKE @q OR a.BankAddress LIKE @q OR a.SwiftCode LIKE @q)");
-            }
-
-            // NOTE:
-            // If your POCO Bas_Bank has bool? for IsActive/Approved, keep as-is.
-            // If it has int?, then CAST them to INT in SELECT (see commented lines).
+            } 
 
             var sql = $@"
-SELECT 
-    a.BankID,
-    a.BankName,
-    a.BankShortName,
-    a.BankAddress,
-    a.SwiftCode,
-    ISNULL(a.IsActive,0)   AS IsActive,   -- keep if Bas_Bank.IsActive is bool?
-    ISNULL(a.Approved,0)   AS Approved    -- keep if Bas_Bank.Approved is bool?
-    -- CAST(ISNULL(a.IsActive,0) AS INT)  AS IsActive,   -- use these two CAST lines
-    -- CAST(ISNULL(a.Approved,0) AS INT)  AS Approved    -- if Bas_Bank uses int? instead
-FROM bas_Bank a
-{where}
-ORDER BY a.BankID DESC;";
+                        SELECT *
+                        FROM bas_Bank a
+                        {where}
+                        ORDER BY a.BankID DESC;";
 
             var countSql = $@"SELECT COUNT(1) FROM bas_Bank a {where};";
 
             if (_connection.State != ConnectionState.Open) _connection.Open();
             try
             {
-                var items = (await _connection.QueryAsync<Bas_Bank>(sql, dp)).AsList(); // finishes first reader
-                var total = await _connection.ExecuteScalarAsync<int>(countSql, dp);    // then run count
+                var items = (await _connection.QueryAsync<Bas_Bank>(sql, dp)).AsList();  
+                var total = await _connection.ExecuteScalarAsync<int>(countSql, dp);    
 
                 var result = new GridResult<Bas_Bank>().Data(items, total);
                 result.Columnses ??= new List<GridColumns>();

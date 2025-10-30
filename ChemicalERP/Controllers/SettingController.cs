@@ -21,7 +21,7 @@ namespace ChemicalERP.Controllers
         public async Task<IActionResult> GetBankList([FromRoute] Status status, [FromQuery] string? q = null)
         {
             var grid = await _service.GetBankListAsync(status, q);
-            return Ok(grid);   // { Items, TotalCount, Columnses }
+            return Ok(grid);   
         }
         [HttpPost("saveBank")]
         public async Task<IActionResult> SaveBank([FromBody] Bas_Bank entity)
