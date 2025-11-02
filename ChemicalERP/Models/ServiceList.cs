@@ -10,6 +10,7 @@ namespace ChemicalERP.Models
         {
             services.AddScoped<ILoginService, LoginService>(); 
             services.AddScoped<ISettingService, SettingService>(); 
+            services.AddScoped<IDropDownListService, DropDownListService>(); 
         }
     }
 }
