@@ -65,9 +65,9 @@ namespace ChemicalERP.Services
         public List<DropDownList> Getuoms()
         {
             var sql = @"SELECT 
-            CompanyID AS id, 
-            CompanyName AS text 
-            FROM PDLHRM..bas_Company 
+            UOMID AS id, 
+            UOM AS text 
+            FROM PDLHRM..bas_UOM 
             WHERE IsActive = 1";
             var list = _connection.Query<DropDownList>(sql).ToList();
             return list;
